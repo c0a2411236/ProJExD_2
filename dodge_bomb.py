@@ -16,6 +16,7 @@ DELTA = {  # 移動量辞書
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+
 def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     """
     引数：こうかとんRectまたは爆弾Rect
@@ -102,22 +103,22 @@ def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
     return kk_img
 
 
-def calc_orientation(org: pg.Rect, dst: pg.Rect,current_xy: tuple[float, float]) -> tuple[float, float]:
-    """
-    引数：爆弾の位置、こうかとんの位置、爆弾の方向ベクトル
-    戻り値：爆弾からみたこうかとんの位置への爆弾の方向ベクトル
-    """
-    if (org[0] - dst[0] < 0):
-        current_xy[0] *= -1
-    elif(org[0] - dst[0] > 0):
-        current_xy[0] *= +1
+# def calc_orientation(org: pg.Rect, dst: pg.Rect,current_xy: tuple[float, float]) -> tuple[float, float]:
+#     """
+#     引数：爆弾の位置、こうかとんの位置、爆弾の方向ベクトル
+#     戻り値：爆弾からみたこうかとんの位置への爆弾の方向ベクトル
+#     """
+#     if (org[0] - dst[0] < 0):
+#         current_xy[0] *= -1
+#     elif(org[0] - dst[0] > 0):
+#         current_xy[0] *= +1
 
-    if (org[1] - dst[1] < 0 ):
-        current_xy[1] *= -1
-    elif(org[1] - dst[1] > 0 ):
-        current_xy[1] *= +1
+#     if (org[1] - dst[1] < 0 ):
+#         current_xy[1] *= -1
+#     elif(org[1] - dst[1] > 0 ):
+#         current_xy[1] *= +1
     
-    return current_xy[0],current_xy[1]
+#     return current_xy[0],current_xy[1]
 
 
 def main():
@@ -145,7 +146,7 @@ def main():
             return    
         
         screen.blit(bg_img, [0, 0]) 
-        vx, vy = calc_orientation(bb_rct, kk_rct, [vx, vy])  # 爆弾追尾
+        #vx, vy = calc_orientation(bb_rct, kk_rct, [vx, vy])  # 爆弾追尾
         
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
@@ -163,7 +164,6 @@ def main():
         # if key_lst[pg.K_RIGHT]:
         #     sum_mv[0] += 5
         
-
         bb_imgs, bb_accs = init_bb_imgs()  # 爆弾の拡大と加速度を取得
         avx = vx*bb_accs[min(tmr//500, 9)]  # 爆弾を加速
         bb_img = bb_imgs[min(tmr//500, 9)]  # 爆弾を拡大
