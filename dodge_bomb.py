@@ -30,6 +30,12 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     
 
 def gameover(screen: pg.Surface) -> None:  # ゲームオーバー画面
+    """
+    引数：ディスプレイ画面
+    戻り値：画面を暗くする
+            Game overの文字と両脇に泣いているこうかとんを表示する
+            画面を更新した5秒後にゲームを終了する
+    """
     blackout = pg.Surface((WIDTH,HEIGHT))
     blackout.fill((0, 0, 0))
     blackout.set_alpha(150)
@@ -46,6 +52,22 @@ def gameover(screen: pg.Surface) -> None:  # ゲームオーバー画面
     pg.display.update()
     time.sleep(5)
 
+
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:  # 爆弾の拡大度、加速度のリストを返す
+    """
+    引数：なし
+    戻り値：爆弾の拡大した画像を格納したリスト、1~10の加速度を格納したリスト
+    画像を格納したリストはpg.Surface、加速度を格納したリストにはintの型で入っている
+    """
+    bb_accs = [a for a in range(1, 11)]
+    bb_imgs = []
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_img.set_colorkey((0, 0, 0))
+        bb_imgs.append(bb_img)
+    
+    return bb_imgs, bb_accs
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -88,12 +110,15 @@ def main():
         #     sum_mv[0] -= 5
         # if key_lst[pg.K_RIGHT]:
         #     sum_mv[0] += 5
+        bb_imgs, bb_accs = init_bb_imgs()  # 爆弾の拡大と加速度を取得
+        avx = vx*bb_accs[min(tmr//500, 9)]  # 爆弾を加速
+        bb_img = bb_imgs[min(tmr//500, 9)]  # 爆弾を拡大
 
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0],-sum_mv[1])  # 移動をなかったことにする
         screen.blit(kk_img, kk_rct)  # こうかとん描画
-        bb_rct.move_ip(vx, vy)  # 爆弾移動
+        bb_rct.move_ip(avx, vy)  # 爆弾移動
         yoko, tate = check_bound(bb_rct)
         if not yoko:
             vx *= -1
@@ -101,6 +126,7 @@ def main():
             vy *= -1
 
         screen.blit(bb_img, bb_rct)  # 爆弾描画
+
         pg.display.update()
         tmr += 1
         clock.tick(50)
