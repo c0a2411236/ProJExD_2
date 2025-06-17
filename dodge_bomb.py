@@ -13,6 +13,7 @@ DELTA = {  # 移動量辞書
     pg.K_RIGHT: (+5, 0)
 }
 
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
@@ -69,6 +70,38 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:  # 爆弾の拡大度�
     
     return bb_imgs, bb_accs
 
+
+def get_kk_img(sum_mv: tuple[int, int]) -> pg.Surface:
+    """
+    引数：こうかとんの移動量タプル
+    戻り値：移動量タプルに対応した画像Surface
+    こうかとんの向きが動いた方向に向くようにする
+    """
+    kk_img = pg.image.load("fig/3.png")
+    if sum_mv == (+5, 0):
+        kk_img = pg.transform.flip(kk_img, True, False)
+        kk_img = pg.transform.rotozoom(kk_img, 0, 0.9)
+    elif sum_mv == (+5, +5):
+        kk_img = pg.transform.flip(kk_img, True, False)
+        kk_img = pg.transform.rotozoom(kk_img, -45, 0.9)
+    elif sum_mv == (0, +5):
+        kk_img = pg.transform.flip(kk_img, True, False)
+        kk_img = pg.transform.rotozoom(kk_img, -90, 0.9)
+    elif sum_mv == (+5, -5):
+        kk_img = pg.transform.flip(kk_img, True, False)
+        kk_img = pg.transform.rotozoom(kk_img, 45, 0.9)
+    elif sum_mv == (0, +5):
+        kk_img = pg.transform.flip(kk_img, True, False)
+        kk_img = pg.transform.rotozoom(kk_img, 90, 0.9)
+    elif sum_mv == (-5, 0):
+        kk_img = pg.transform.rotozoom(kk_img, 0, 0.9)
+    elif sum_mv == (-5, -5):
+        kk_img = pg.transform.rotozoom(kk_img, -45, 0.9)
+    elif sum_mv == (-5, +5):
+        kk_img = pg.transform.rotozoom(kk_img, 45, 0.9)
+    return kk_img
+
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -113,10 +146,11 @@ def main():
         bb_imgs, bb_accs = init_bb_imgs()  # 爆弾の拡大と加速度を取得
         avx = vx*bb_accs[min(tmr//500, 9)]  # 爆弾を加速
         bb_img = bb_imgs[min(tmr//500, 9)]  # 爆弾を拡大
-
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0],-sum_mv[1])  # 移動をなかったことにする
+        kk_img = get_kk_img((0, 0)) 
+        kk_img = get_kk_img(tuple(sum_mv))  # 飛ぶ方向に従ってこうかとん画像を切り替える
         screen.blit(kk_img, kk_rct)  # こうかとん描画
         bb_rct.move_ip(avx, vy)  # 爆弾移動
         yoko, tate = check_bound(bb_rct)
